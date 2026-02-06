@@ -1,0 +1,6 @@
+retention_status=OK
+backup_deleted=0
+snapshot_deleted=0
+backup_keep_days=7
+snapshot_keep_days=3
+checked_at=2026-02-06T05:55:56Z

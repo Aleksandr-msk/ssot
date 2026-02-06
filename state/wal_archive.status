@@ -1,0 +1,5 @@
+wal_archive_enabled=NO
+archive_mode=OFF
+archive_command=UNCONFIGURED
+reason=no_pitr_no_offsite
+checked_at=2026-02-06T09:26:20Z

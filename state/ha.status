@@ -1,0 +1,5 @@
+ha_enabled=NO
+replication=NO
+mode=single_instance
+reason=ha_not_required_by_design
+checked_at=2026-02-06T09:30:19Z

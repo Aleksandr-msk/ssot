@@ -1,0 +1,5 @@
+wal_status=OK
+wal_used_pct=41
+wal_size=145M
+threshold_pct=70
+checked_at=2026-02-06T05:42:24Z

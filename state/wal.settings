@@ -1,0 +1,4 @@
+max_wal_size=4GB
+min_wal_size=1GB
+wal_keep_size=0
+checkpoint_timeout=5min

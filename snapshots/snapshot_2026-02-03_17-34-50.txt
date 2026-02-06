@@ -1,0 +1,8 @@
+timestamp=2026-02-03_17-34-50
+pg_version=15
+db_schema=14.10
+active_pvc=awx/data-awx-postgres-0,awx/postgres-15-awx-postgres-15-0,trading/trading-postgres-pvc,
+wal_dirs_found=1
+wal_path=/var/lib/kubelet/pods/85c209bc-42fe-4437-ad41-5adff096969a/volumes/kubernetes.io~local-volume/pvc-35868883-7b0f-4cc1-ab0e-6833cd25a4ad/pg_wal
+wal_size=49M
+wal_fs_usage=37%

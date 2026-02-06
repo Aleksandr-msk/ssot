@@ -1,0 +1,53 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: ssot-restore-drill
+  namespace: ops
+spec:
+  restartPolicy: Never
+
+  securityContext:
+    runAsUser: 999
+    runAsGroup: 999
+    fsGroup: 999
+    fsGroupChangePolicy: OnRootMismatch
+
+  containers:
+    - name: postgres
+      image: postgres:15
+      env:
+        - name: POSTGRES_DB
+          value: trading
+        - name: POSTGRES_USER
+          value: trading
+        - name: POSTGRES_PASSWORD
+          value: trading
+        - name: PGDATA
+          value: /var/lib/postgresql/data
+      lifecycle:
+        postStart:
+          exec:
+            command:
+              - /bin/bash
+              - -c
+              - |
+                set -e
+                echo "WAIT FOR POSTGRES"
+                until pg_isready -U trading; do sleep 1; done
+                echo "RESTORE"
+                psql -U trading -d trading < /backup/latest.sql
+                echo "RESTORE OK"
+      volumeMounts:
+        - name: pgdata
+          mountPath: /var/lib/postgresql/data
+        - name: backup
+          mountPath: /backup
+          readOnly: true
+
+  volumes:
+    - name: pgdata
+      emptyDir: {}
+    - name: backup
+      hostPath:
+        path: /opt/ssot-backup/dumps
+        type: Directory

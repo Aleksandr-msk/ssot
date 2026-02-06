@@ -1,0 +1,7 @@
+offsite/
+wal-archive/
+snapshots/
+state/
+*.status
+*.lock
+*.ts

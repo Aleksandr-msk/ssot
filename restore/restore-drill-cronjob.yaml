@@ -1,0 +1,38 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: ssot-restore-drill
+  namespace: trading
+spec:
+  schedule: "0 3 * * *"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 0
+      template:
+        spec:
+          restartPolicy: Never
+          containers:
+            - name: restore-drill
+              image: postgres:15
+              command:
+                - /bin/bash
+                - /opt/ssot/restore/restore-drill.sh
+              volumeMounts:
+                - name: ssot-backup
+                  mountPath: /opt/ssot-backup
+                  readOnly: true
+                - name: ssot-restore
+                  mountPath: /opt/ssot/restore
+                  readOnly: true
+          volumes:
+            - name: ssot-backup
+              hostPath:
+                path: /opt/ssot-backup
+                type: Directory
+            - name: ssot-restore
+              hostPath:
+                path: /opt/ssot/restore
+                type: Directory
