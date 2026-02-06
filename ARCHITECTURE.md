@@ -2233,3 +2233,216 @@ SSOT AUTHORITY: /opt/ssot
 ❌ High Availability / репликация  
 ❌ SLA / RPO / RTO как архитектурные гарантии  
 ❌ Квоты файловой системы  
+
+# SSOT Architecture — Полное описание
+
+## 0. Базовая платформа (Host OS)
+
+* Операционная система: Ubuntu Server (LTS)
+* Назначение: хост для Kubernetes single-node кластера и SSOT-инфраструктуры
+* Модель эксплуатации: один сервер, один диск (VirtualBox), без HA
+* Критичное требование: предотвращение переполнения диска
+
+Гарантии уровня ОС:
+
+* systemd
+* стандартные cron/systemd timers
+* отсутствие скрытых сервисов, влияющих на диск
+
+Ограничения:
+
+* отказ хоста = остановка всей системы
+* восстановление вручную
+
+---
+
+## 1. Контейнерная платформа
+
+### 1.1 Kubernetes
+
+* Single-node Kubernetes кластер
+* Используется как orchestration layer, а не как HA-платформа
+* Контроль состояния Pod/Volume
+
+Ограничения:
+
+* Нет replica set для БД
+* Нет автоматического failover
+
+---
+
+### 1.2 Storage
+
+* local-path provisioner
+* PVC привязан к конкретной ноде
+* Используется для Postgres data directory
+
+Риски:
+
+* потеря ноды = потеря данных
+
+Митигировано:
+
+* snapshot + logical backup
+
+---
+
+## 2. PostgreSQL
+
+### 2.1 Размещение
+
+* StatefulSet
+* 1 Pod: trading-postgres-0
+* Данные:
+
+  * PGDATA внутри PVC
+  * WAL внутри того же volume
+
+---
+
+### 2.2 Конфигурация WAL
+
+Фактические параметры:
+
+* max_wal_size = 4GB
+* min_wal_size = 1GB
+* wal_keep_size = 0
+* checkpoint_timeout = 5min
+
+Гарантии:
+
+* WAL ограничен по размеру
+* чекпойнты регулярны
+
+Ограничения:
+
+* нет WAL-архивации
+* нет PITR
+
+---
+
+## 3. SSOT Layer (/opt/ssot)
+
+SSOT — Single Source of Truth для архитектурного состояния.
+
+### 3.1 Структура
+
+* /opt/ssot/state — фактическое состояние
+* /opt/ssot/ops — операционные проверки и guard-скрипты
+* /opt/ssot/audit — архитектурные аудиты
+* /opt/ssot-backup — logical backup
+
+Все решения фиксируются через *.status файлы.
+
+---
+
+## 4. WAL Control
+
+### 4.1 WAL Check
+
+* Скрипт: wal_check.sh
+* Источник истины: pg_wal в PVC
+* Порог: 70%
+
+Результат:
+
+* wal.status
+* wal.last_check
+
+---
+
+### 4.2 WAL Gate
+
+* Backup / snapshot запрещены, если wal_status != OK
+
+---
+
+## 5. Snapshot
+
+* Snapshot создаётся вручную / скриптом
+* Символическая ссылка latest
+* Проверяется свежесть (<=10 минут)
+
+---
+
+## 6. Backup
+
+### 6.1 Тип
+
+* Logical backup
+* pg_dump внутри Postgres Pod
+
+### 6.2 Ограничения
+
+* Нет физического backup
+* Нет basebackup
+
+---
+
+## 7. Retention (Disk Safety)
+
+### 7.1 Backup retention
+
+* Хранение: 7 дней
+* Очистка автоматическая
+
+### 7.2 Snapshot retention
+
+* Хранение: 3 дня
+
+---
+
+## 8. Disk Guard
+
+* Проверяет:
+
+  * WAL status
+  * retention status
+
+* Блокирует операции при риске
+
+---
+
+## 9. Явно отключённые возможности
+
+Каждая отключённая возможность имеет status-файл:
+
+* PITR: pitr.status
+* WAL archive: wal_archive.status
+* Offsite backup: offsite.status
+* Basebackup: basebackup.status
+* HA: ha.status
+* SLA/RPO: sla_rpo.status
+* Quota: quota.status
+
+Отключение = архитектурное решение, не баг.
+
+---
+
+## 10. Observability
+
+* Файловая, детерминированная
+* Нет зависимости от Prometheus / Grafana
+* Состояние читается напрямую
+
+---
+
+## 11. Модель отказа
+
+* Любой отказ видим
+* Любой риск фиксируется до катастрофы
+* Система не допускает silent failure
+
+---
+
+## 12. Итог
+
+Архитектура:
+
+* проста
+* честна
+* контролирует диск
+* не притворяется HA
+
+Разрешена к эксплуатации в продакшене
+в рамках заявленных ограничений.
