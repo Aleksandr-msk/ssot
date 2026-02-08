@@ -1,4 +1,4 @@
-ssot.timestamp=2026-02-08 14:15:01
+ssot.timestamp=2026-02-08 14:30:01
 ssot.pg_version=15
 ssot.db_schema=14.10
 ssot.wal_policy=# SSOT WAL POLICY MODE=fixed MAX_WAL_SIZE_GB=10 CHECK_INTERVAL_MIN=5 SOURCE=ssot 
@@ -6,5 +6,5 @@ ssot.wal_size=UNKNOWN
 ssot.wal_last_check=2026-02-06 05:42:24
 ssot.audit_status=OK
 ssot.audit_last=2026-02-06 05:34:34
-ssot.snapshot_file=/opt/ssot/snapshots/snapshot_2026-02-08_14-15-01.txt
-ssot.snapshot_mtime=2026-02-08 14:15:01.390534272 +0000
+ssot.snapshot_file=/opt/ssot/snapshots/snapshot_2026-02-08_14-30-01.txt
+ssot.snapshot_mtime=2026-02-08 14:30:01.696500277 +0000

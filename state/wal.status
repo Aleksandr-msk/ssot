@@ -1,5 +1,7 @@
-wal_status=OK
-wal_used_pct=41
-wal_size=145M
-threshold_pct=70
-checked_at=2026-02-06T05:42:24Z
+timestamp=2026-02-07T19:43:51+00:00
+namespace=trading
+pod=trading-postgres-0
+wal_dir=/var/lib/postgresql/data/pg_wal
+wal_size_bytes=150994944
+pvc_free_bytes=28146262016
+status=OK
