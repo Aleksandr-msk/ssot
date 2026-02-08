@@ -12,17 +12,12 @@ mkdir -p "${STATE_DIR}"
 STATUS="OK"
 REASON=""
 
-# --- WAL check ---
-if [[ ! -f "${WAL_STATUS_FILE}" ]]; then
+# --- WAL gate (SSOT) ---
+/opt/ssot/wal_gate.sh || {
   STATUS="FAIL"
-  REASON="wal.status missing"
-else
-  source "${WAL_STATUS_FILE}"
-  if [[ "${wal_status:-FAIL}" != "OK" ]]; then
-    STATUS="FAIL"
-    REASON="WAL not OK"
-  fi
-fi
+  REASON="WAL gate blocked"
+}
+
 
 # --- Retention check ---
 if [[ "${STATUS}" == "OK" ]]; then
