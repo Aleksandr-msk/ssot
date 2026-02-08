@@ -1,3 +1,6 @@
+
+АрХитектУра
+
 # SSOT Architecture Contract
 
 STAGE 1 — Truth fixation — ✅  
