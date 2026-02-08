@@ -1,7 +1,24 @@
+# runtime / state
+state/
 offsite/
 wal-archive/
 snapshots/
-state/
+
+# generated status files
 *.status
 *.lock
 *.ts
+
+# user / editor / caches
+.vscode-server/
+.cache/
+.local/
+.docker/
+.config/
+.kube/
+
+# temp / backups
+*.log
+*.tmp
+*~
+snapshots/

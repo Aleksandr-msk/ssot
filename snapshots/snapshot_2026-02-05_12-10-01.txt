@@ -1,5 +1,0 @@
-timestamp=2026-02-05_12-10-01
-pg_version=15
-db_schema=14.10
-wal_size=UNKNOWN
-wal_last_check=2026-02-03 10:15:00
